@@ -64,6 +64,32 @@ defmodule DigitalOcean do
   end
 end
 
+defmodule DropletStatusHandler do
+  def init(nil) do
+    {:ok, %{ }}
+  end
+
+  def handle_call({:listen_for, droplet_id, status, pid}, listeners) do
+    new_listeners =
+      Map.update(
+        listeners,
+        {droplet_id, status},
+        [pid],
+        fn pids -> [pid | pids] end
+      )
+    {:ok, :ok, new_listeners}
+  end
+
+  # {id, status} => [pids]
+  def handle_event({:achieved_status, droplet_id, status}, listeners) do
+    id_and_status = {droplet_id, status}
+    {pids, new_listeners} = Map.pop(listeners, id_and_status, [ ])
+    Enum.each(pids, fn pid -> send(pid, id_and_status) end)
+    {:ok, new_listeners}
+  end
+  def handle_event(_event, listeners), do: {:ok, listeners}
+end
+
 defmodule Launcher do
   def launch_unless_running(props) do
     DigOc.droplets!.droplets
@@ -73,7 +99,7 @@ defmodule Launcher do
 
   defp do_launch_unless_running(nil, props) do
     IO.puts "Launching #{props.name}..."
-    DigitalOcean.create_droplet!(props)
+    launch_droplet(props)
   end
   defp do_launch_unless_running(
     %{image: %{slug: r_image}, region: %{slug: r_region}, size: %{slug: r_size}},
@@ -87,7 +113,28 @@ defmodule Launcher do
     IO.puts "Shutting down #{props.name}..."
     DigitalOcean.delete_droplet!(running)
     IO.puts "Relaunching #{props.name}..."
-    DigitalOcean.create_droplet!(props)
+    launch_droplet(props)
+  end
+
+  defp launch_droplet(props) do
+    droplet_id = DigitalOcean.create_droplet!(props).droplet.id
+    wait_for_ready_status(droplet_id, props.name)
+  end
+
+  defp wait_for_ready_status(droplet_id, droplet_name) do
+    GenEvent.add_handler(DigOc.event_manager, DropletStatusHandler, nil)
+    GenEvent.call(
+      DigOc.event_manager,
+      DropletStatusHandler,
+      {:listen_for, droplet_id, :active, self}
+    )
+
+    receive do
+      {^droplet_id, :active} ->
+        IO.puts "#{droplet_name} is ready."
+      after 10 * 60 * 1_000 ->
+        IO.puts "#{droplet_name} was never ready."
+    end
   end
 end
 
