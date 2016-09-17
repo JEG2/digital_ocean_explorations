@@ -1,24 +1,18 @@
 # DigitalOceanExplorations
 
-**TODO: Add description**
+## Plan
 
-## Installation
++-> Launcher -> SSH -> Snapshot -+
+|                                |
++--------------------------------+
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+### Unknowns
 
-  1. Add `digital_ocean_explorations` to your list of dependencies in `mix.exs`:
+* Environments (staging, production)
+* Deployment Strategies
 
-    ```elixir
-    def deps do
-      [{:digital_ocean_explorations, "~> 0.1.0"}]
-    end
-    ```
+### SSH Layers
 
-  2. Ensure `digital_ocean_explorations` is started before your application:
-
-    ```elixir
-    def application do
-      [applications: [:digital_ocean_explorations]]
-    end
-    ```
-
+* DSL
+* Commands (Porcelain)
+* Raw SSH (Plumbing)
