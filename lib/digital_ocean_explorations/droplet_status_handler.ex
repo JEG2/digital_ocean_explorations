@@ -17,6 +17,12 @@ defmodule DigitalOceanExplorations.DropletStatusHandler do
 
   # Server API
 
+  #
+  # This handle maintains a map keyed by tuples of droplet IDs and status
+  # atoms.  The values are a list of PIDs awaiting notification.  When a specific
+  # ID reaches the status it's paired with, all associated PIDs will receive a
+  # message of the form `{droplet_id, status}`.
+  #
   def init(nil) do
     {:ok, %{ }}
   end
@@ -32,7 +38,6 @@ defmodule DigitalOceanExplorations.DropletStatusHandler do
     {:ok, :ok, new_listeners}
   end
 
-  # {id, status} => [pids]
   def handle_event({:achieved_status, droplet_id, status}, listeners) do
     id_and_status = {droplet_id, status}
     {pids, new_listeners} = Map.pop(listeners, id_and_status, [ ])
