@@ -1,10 +1,14 @@
 # DigitalOceanExplorations
 
+## Usage
+
+You must generate an SSH key into `priv/ssh` before you can use some of this code.
+
 ## Plan
 
-+-> Launcher -> SSH -> Snapshot -+
-|                                |
-+--------------------------------+
+    +-> Launcher -> SSH -> Snapshot -+
+    |                                |
+    +--------------------------------+
 
 ### Unknowns
 
