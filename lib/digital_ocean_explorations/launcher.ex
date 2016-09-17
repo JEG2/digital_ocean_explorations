@@ -2,8 +2,7 @@ defmodule DigitalOceanExplorations.Launcher do
   alias DigitalOceanExplorations.{DigitalOceanAPI, DropletStatusHandler}
 
   def launch_unless_running(props) do
-    DigOc.droplets!.droplets
-    |> Enum.find(fn droplet -> droplet.name == props.name end)
+    DigitalOceanAPI.find_droplet!(props.name)
     |> do_launch_unless_running(props)
   end
 

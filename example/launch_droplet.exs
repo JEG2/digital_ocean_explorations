@@ -1,5 +1,10 @@
 alias DigitalOceanExplorations.{DigitalOceanAPI, Launcher}
 
+ssh_key = DigitalOceanAPI.find_or_create_key!("Elixir Key", fn ->
+  "../priv/ssh/id_rsa.pub"
+  |> Path.expand(__DIR__)
+  |> File.read!
+end)
 image = DigitalOceanAPI.image_for_distribution_and_version!("Debian", "8.5 x64")
 region =
   DigitalOceanAPI.regions_for_image!(image)
@@ -10,7 +15,8 @@ props = %{
   name: "elixir-launched",
   image: image.slug,
   region: region.slug,
-  size: size
+  size: size,
+  ssh_keys: [ssh_key.id]
 }
 
 Launcher.launch_unless_running(props)

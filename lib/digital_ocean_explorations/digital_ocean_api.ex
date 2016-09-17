@@ -1,4 +1,28 @@
 defmodule DigitalOceanExplorations.DigitalOceanAPI do
+  def keys! do
+    DigOc.keys!.ssh_keys
+  end
+
+  def find_or_create_key!(name, public_key_loader) do
+    key =
+      keys!
+      |> Enum.find(fn key -> key.name == name end)
+    if key do
+      key
+    else
+      DigOc.Key.new!(name, public_key_loader.()).ssh_key
+    end
+  end
+
+  def droplets! do
+    DigOc.droplets!.droplets
+  end
+
+  def find_droplet!(name) do
+    droplets!
+    |> Enum.find(fn droplet -> droplet.name == name end)
+  end
+
   def images! do
     first_page = DigOc.images!(:distribution)
     do_images!(first_page.images, first_page)
