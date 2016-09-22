@@ -1,8 +1,5 @@
 # To Do
 
-* [ ] Determine command success
-* [ ] Queue commands, halting the sequence on failure
-
 * [X] Programmatically filter image, region, size
 * [X] Launch droplet
 * [X] Don't launch droplet if it's already up
@@ -12,3 +9,5 @@
 * [X] Figure out programmatic SSH key management
 * [X] Programmatically making SSH connection
 * [X] Find a way to issue SSH commands
+* [X] Determine command success
+* [X] Queue commands, halting the sequence on failure

@@ -14,6 +14,19 @@ defmodule DigitalOceanExplorations.DigitalOceanAPI do
     end
   end
 
+  def find_keys!(names) do
+    keys = keys!
+    found =
+      Enum.map(names, fn name ->
+        {name, Enum.find(keys, fn key -> key.name == name end)}
+      end)
+    missing = Enum.find(found, fn {_name, key} -> is_nil(key) end)
+    if missing do
+      raise "Key not found:  #{elem(missing, 0)}"
+    end
+    Enum.map(found, fn {_name, key} -> key end)
+  end
+
   def droplets! do
     DigOc.droplets!.droplets
   end

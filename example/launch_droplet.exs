@@ -5,7 +5,8 @@ ssh_key = DigitalOceanAPI.find_or_create_key!("Elixir Key", fn ->
   |> Path.expand(__DIR__)
   |> File.read!
 end)
-image = DigitalOceanAPI.image_for_distribution_and_version!("Debian", "8.5 x64")
+extra_ssh_keys = DigitalOceanAPI.find_keys!(["JEG2's Public Key"])
+image = DigitalOceanAPI.image_for_distribution_and_version!("Ubuntu", "16.04.1 x64")
 region =
   DigitalOceanAPI.regions_for_image!(image)
   |> DigitalOceanAPI.maximize_features
@@ -16,7 +17,7 @@ props = %{
   image: image.slug,
   region: region.slug,
   size: size,
-  ssh_keys: [ssh_key.id]
+  ssh_keys: [ssh_key.id | Enum.map(extra_ssh_keys, fn key -> key.id end)]
 }
 
 Launcher.launch_unless_running(props)
