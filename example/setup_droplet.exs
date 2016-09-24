@@ -100,13 +100,13 @@ defmodule SSH do
       :ssh_connection.send(connection, channel, ssh_command.data)
       :ssh_connection.send_eof(connection, channel)
     end
-    :ok = :ssh_connection.close(connection, channel)
     ssh_result =
       if ssh_command.test do
         SSHResultReader.read_results(connection, channel)
       else
         nil
       end
+    :ok = :ssh_connection.close(connection, channel)
     SSHCommand.check_sucess(ssh_command, ssh_result)
   end
 end
