@@ -11,10 +11,9 @@ defmodule DigitalOceanExplorations.Launcher do
     launch_droplet(props)
   end
   defp do_launch_unless_running(
-    %{image: %{slug: r_image}, region: %{slug: r_region}, size: %{slug: r_size}},
-    props = %{image: p_image, region: p_region, size: p_size}
-  )
-  when r_image == p_image and r_region == p_region and r_size == p_size do
+    %{image: %{slug: image}, region: %{slug: region}, size: %{slug: size}},
+    props = %{image: image, region: region, size: size}
+  ) do
     IO.puts "#{props.name} is already running."
     :ok
   end
