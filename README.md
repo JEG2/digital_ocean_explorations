@@ -18,5 +18,9 @@ You must generate an SSH key into `priv/ssh` before you can use some of this cod
 ### SSH Layers
 
 * DSL
+    * Abstract commands:  `install "some-package"`
 * Commands (Porcelain)
+    * Translators for abstract commands to mid-level (distribution and version)
+    * Higher-level:  `CreateFileCommand.new(name, permissions)`
+    * Lower-level:  `EditFileCommand.new(file, ...)`
 * Raw SSH (Plumbing)

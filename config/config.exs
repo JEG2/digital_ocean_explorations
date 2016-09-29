@@ -18,8 +18,13 @@ use Mix.Config
 #
 # Or configure a 3rd-party app:
 #
-#     config :logger, level: :info
-#
+
+ssh_logger_level =
+  case System.get_env("SSH_LOGGER_LEVEL") do
+    level when level in ~w[debug info warn error] -> String.to_atom(level)
+    _ -> :info
+  end
+config :logger, level: ssh_logger_level
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

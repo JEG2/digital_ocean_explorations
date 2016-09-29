@@ -1,5 +1,13 @@
 # To Do
 
+* [ ] Fix reboot's expectations (with timeout)
+* [ ] Figure how to wait on server to be ready
+* [ ] Add higher level, concrete commands
+* [ ] Add compound commands
+* [ ] Add abstract commands
+* [ ] Translate from abstract to concrete commands (by distribution and version)
+* [ ] Support user added commands
+
 * [X] Programmatically filter image, region, size
 * [X] Launch droplet
 * [X] Don't launch droplet if it's already up
@@ -11,3 +19,4 @@
 * [X] Find a way to issue SSH commands
 * [X] Determine command success
 * [X] Queue commands, halting the sequence on failure
+* [X] Progress of SSH commands issued
