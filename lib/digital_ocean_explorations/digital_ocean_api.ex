@@ -60,37 +60,37 @@ defmodule DigitalOceanExplorations.DigitalOceanAPI do
     |> Enum.find(fn image -> image.name == version end)
   end
 
-  def regions! do
-    DigOc.regions!.regions
-  end
+  # def regions! do
+  #   DigOc.regions!.regions
+  # end
 
-  def regions_for_image!(image) do
-    regions = regions!
-    Enum.map(image.regions, fn slug ->
-      Enum.find(regions, fn region -> region.slug == slug end)
-    end)
-  end
+  # def regions_for_image!(image) do
+  #   regions = regions!
+  #   Enum.map(image.regions, fn slug ->
+  #     Enum.find(regions, fn region -> region.slug == slug end)
+  #   end)
+  # end
 
-  def maximize_features(regions) do
-    best_feature_count =
-      regions
-      |> Enum.map(fn region -> length(region.features) end)
-      |> Enum.max
-    regions
-    |> Enum.filter(fn region ->
-      length(region.features) == best_feature_count
-    end)
-  end
+  # def maximize_features(regions) do
+  #   best_feature_count =
+  #     regions
+  #     |> Enum.map(fn region -> length(region.features) end)
+  #     |> Enum.max
+  #   regions
+  #   |> Enum.filter(fn region ->
+  #     length(region.features) == best_feature_count
+  #   end)
+  # end
 
-  def favor_region(regions, favorites) do
-    Enum.find(regions, hd(regions), fn region ->
-      String.contains?(region.name, favorites)
-    end)
-  end
+  # def favor_region(regions, favorites) do
+  #   Enum.find(regions, hd(regions), fn region ->
+  #     String.contains?(region.name, favorites)
+  #   end)
+  # end
 
-  def smallest_size(region) do
-    hd(region.sizes)
-  end
+  # def smallest_size(region) do
+  #   hd(region.sizes)
+  # end
 
   def create_droplet!(props) do
     DigOc.Droplet.new!(props)
