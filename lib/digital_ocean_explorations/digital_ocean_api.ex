@@ -31,7 +31,11 @@ defmodule DigitalOceanExplorations.DigitalOceanAPI do
     DigOc.droplets!.droplets
   end
 
-  def find_droplet!(name) do
+  def find_droplet!(id) do
+    DigOc.droplet!(id).droplet
+  end
+
+  def find_droplet_by_name!(name) do
     droplets!
     |> Enum.find(fn droplet -> droplet.name == name end)
   end
@@ -59,38 +63,6 @@ defmodule DigitalOceanExplorations.DigitalOceanAPI do
     images_for_distribution!(distribution)
     |> Enum.find(fn image -> image.name == version end)
   end
-
-  # def regions! do
-  #   DigOc.regions!.regions
-  # end
-
-  # def regions_for_image!(image) do
-  #   regions = regions!
-  #   Enum.map(image.regions, fn slug ->
-  #     Enum.find(regions, fn region -> region.slug == slug end)
-  #   end)
-  # end
-
-  # def maximize_features(regions) do
-  #   best_feature_count =
-  #     regions
-  #     |> Enum.map(fn region -> length(region.features) end)
-  #     |> Enum.max
-  #   regions
-  #   |> Enum.filter(fn region ->
-  #     length(region.features) == best_feature_count
-  #   end)
-  # end
-
-  # def favor_region(regions, favorites) do
-  #   Enum.find(regions, hd(regions), fn region ->
-  #     String.contains?(region.name, favorites)
-  #   end)
-  # end
-
-  # def smallest_size(region) do
-  #   hd(region.sizes)
-  # end
 
   def create_droplet!(props) do
     DigOc.Droplet.new!(props)

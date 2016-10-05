@@ -4,7 +4,7 @@ defmodule DigitalOceanExplorations.Launcher do
 
   def launch_unless_running(plan, deployment) do
     properties = determine_properties(plan, deployment)
-    DigitalOceanAPI.find_droplet!(properties.name)
+    DigitalOceanAPI.find_droplet_by_name!(properties.name)
     |> do_launch_unless_running(properties)
   end
 
@@ -53,10 +53,10 @@ defmodule DigitalOceanExplorations.Launcher do
   end
 
   defp launch_droplet(properties) do
-    droplet = DigitalOceanAPI.create_droplet!(properties).droplet
-    DropletStatusHandler.wait_for_active_status(droplet.id)
+    droplet_id = DigitalOceanAPI.create_droplet!(properties).droplet.id
+    DropletStatusHandler.wait_for_active_status(droplet_id)
     |> announce_status(properties.name)
-    droplet
+    DigitalOceanAPI.find_droplet!(droplet_id)
   end
 
   defp announce_status(:active, droplet_name) do
