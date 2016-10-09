@@ -17,7 +17,7 @@ connection = CommandRunner.connect(ip_address)
 useradd = RawCommand.new("useradd -m #{user_name}")
 make_ssh_dir = RawCommand.new("mkdir /home/#{user_name}/.ssh")
 make_keys_file = RawCommand.new(
-  "touch mkdir /home/#{user_name}/.ssh/authorized_keys"
+  "touch /home/#{user_name}/.ssh/authorized_keys"
 )
 chmod_ssh_dir = RawCommand.new("chmod 0700 /home/#{user_name}/.ssh")
 chmod_keys_file = RawCommand.new(

@@ -2,9 +2,14 @@ defmodule DigitalOceanExplorations.SSH.CommandRunner do
   require Logger
   alias DigitalOceanExplorations.SSH.{RawCommand, ResultReader}
 
+  def run_commands(ip_address, command_set) do
+    connect(ip_address)
+    |> send_commands(command_set.commands)
+  end
+
   @defaults [user: "root", user_dir: Path.expand("../../../priv/ssh", __DIR__)]
 
-  def connect(ip_address, options \\ [ ]) do
+  defp connect(ip_address, options \\ [ ]) do
     options = Keyword.merge(@defaults, options)
     :ssh.start
     {:ok, connection} = :ssh.connect(
@@ -17,25 +22,25 @@ defmodule DigitalOceanExplorations.SSH.CommandRunner do
     connection
   end
 
-  def run_commands(connection, [current_command | remaining_commands]) do
-    case run_command(connection, current_command) do
+  defp send_commands(connection, [current_command | remaining_commands]) do
+    case send_command(connection, current_command) do
       :ok ->
         Logger.info("Command succeeded.")
-        run_commands(connection, remaining_commands)
+        send_commands(connection, remaining_commands)
       test_command = %RawCommand{ } ->
         Logger.info("Command completed.  Testing success...")
-        run_commands(connection, [test_command | remaining_commands])
+        send_commands(connection, [test_command | remaining_commands])
       error ->
         Logger.info("Command error:  #{inspect(error)}")
         :ok = :ssh.close(connection)
     end
   end
-  def run_commands(connection, [ ]) do
+  defp send_commands(connection, [ ]) do
     :ok = :ssh.close(connection)
     :ok
   end
 
-  defp run_command(connection, ssh_command) do
+  defp send_command(connection, ssh_command) do
     {:ok, channel} = :ssh_connection.session_channel(connection, :infinity)
     Logger.info("Executing command `#{ssh_command.command}`...")
     :success = :ssh_connection.exec(

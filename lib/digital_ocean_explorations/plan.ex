@@ -55,4 +55,18 @@ defmodule DigitalOceanExplorations.Plan do
       end
     {nil, [abstract_command | abstract_commands]}
   end
+
+  def ssh_command_sets(plan) do
+    plan.command_sets
+    |> Enum.map(fn command_set ->
+      CommandSet.new(
+        user: command_set.user,
+        commands: AbstractCommand.prepare(
+          command_set.commands,
+          plan.distribution,
+          plan.version
+        )
+      )
+    end)
+  end
 end
