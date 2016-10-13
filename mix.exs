@@ -14,7 +14,7 @@ defmodule DigitalOceanExplorations.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :digoc],
+    [applications: [:logger, :digoc, :gen_retry],
      mod: {DigitalOceanExplorations, []}]
   end
 
@@ -28,6 +28,7 @@ defmodule DigitalOceanExplorations.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:digoc, "~> 0.3.3"}]
+    [{:digoc, "~> 0.3.3"},
+     {:gen_retry, "~> 1.0.1"}]
   end
 end

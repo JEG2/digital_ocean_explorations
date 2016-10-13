@@ -9,7 +9,7 @@ defmodule DigitalOceanExplorations.Plan do
   end
 
   defmodule CommandSet do
-    defstruct user: nil, commands: [ ]
+    defstruct user_name: nil, user_ssh_dir: nil, commands: [ ]
 
     def new(details) do
       struct(__MODULE__, details)
@@ -20,7 +20,7 @@ defmodule DigitalOceanExplorations.Plan do
     struct(PlanDetails, details)
   end
 
-  defmacro add_commands(plan, user, dsl_commands) do
+  defmacro add_commands(plan, user_name, user_ssh_dir \\ nil, dsl_commands) do
     abstract_commands =
       Macro.prewalk(dsl_commands, [ ], &dsl_to_commands/2)
       |> elem(1)
@@ -30,7 +30,8 @@ defmodule DigitalOceanExplorations.Plan do
         unquote(plan) |
         command_sets: unquote(plan).command_sets ++ [
           CommandSet.new(
-            user: unquote(user),
+            user_name: unquote(user_name),
+            user_ssh_dir: unquote(user_ssh_dir),
             commands: unquote(abstract_commands)
           )
         ]
@@ -59,14 +60,12 @@ defmodule DigitalOceanExplorations.Plan do
   def ssh_command_sets(plan) do
     plan.command_sets
     |> Enum.map(fn command_set ->
-      CommandSet.new(
-        user: command_set.user,
-        commands: AbstractCommand.prepare(
-          command_set.commands,
-          plan.distribution,
-          plan.version
-        )
+      ssh_commands = AbstractCommand.prepare(
+        command_set.commands,
+        plan.distribution,
+        plan.version
       )
+      %CommandSet{command_set | commands: ssh_commands}
     end)
   end
 end

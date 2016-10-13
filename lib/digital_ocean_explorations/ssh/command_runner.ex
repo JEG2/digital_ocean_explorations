@@ -1,25 +1,33 @@
 defmodule DigitalOceanExplorations.SSH.CommandRunner do
   require Logger
   alias DigitalOceanExplorations.SSH.{RawCommand, ResultReader}
+  alias DigitalOceanExplorations.Plan.CommandSet
 
   def run_commands(ip_address, command_set) do
-    connect(ip_address)
+    connect(ip_address, user_options(command_set))
     |> send_commands(command_set.commands)
   end
 
-  @defaults [user: "root", user_dir: Path.expand("../../../priv/ssh", __DIR__)]
+  defp user_options(%CommandSet{user_name: :root}) do
+    [user: "root", user_dir: Path.expand("../../../priv/ssh", __DIR__)]
+  end
+  defp user_options(%CommandSet{user_name: name, user_ssh_dir: ssh_dir}) do
+    [user: name, user_dir: ssh_dir]
+  end
 
-  defp connect(ip_address, options \\ [ ]) do
-    options = Keyword.merge(@defaults, options)
-    :ssh.start
-    {:ok, connection} = :ssh.connect(
-      String.to_charlist(ip_address),
-      22,
-      user_dir: options |> Keyword.fetch!(:user_dir) |> String.to_charlist,
-      silently_accept_hosts: true,
-      user: options |> Keyword.fetch!(:user) |> String.to_charlist
-    )
-    connection
+  defp connect(ip_address, options) do
+    GenRetry.Task.async(fn ->
+      :ssh.start
+      {:ok, connection} = :ssh.connect(
+        String.to_charlist(ip_address),
+        22,
+        user_dir: options |> Keyword.fetch!(:user_dir) |> String.to_charlist,
+        silently_accept_hosts: true,
+        user: options |> Keyword.fetch!(:user) |> String.to_charlist
+      )
+      connection
+    end, retries: 3)
+    |> Task.await(:infinity)
   end
 
   defp send_commands(connection, [current_command | remaining_commands]) do

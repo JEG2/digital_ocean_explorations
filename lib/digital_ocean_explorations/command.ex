@@ -54,7 +54,18 @@ defmodule DigitalOceanExplorations.Command do
           [ RawCommand.new(
             "sed -i -e 's/#{pattern}/#{replacement}/' #{path}",
             test: :command,
-            expected: RawCommand.new("grep '#{replacement}' #{path}")
+            expected: RawCommand.new("grep '#{grep_escape replacement}' #{path}")
+          ) ]
+        end
+      ),
+      new(
+        name: :insert_before_in_file,
+        supports: %{"Ubuntu" => ["16.04.1 x64"]},
+        converter: fn path, pattern, content ->
+          [ RawCommand.new(
+            "sed -i -e 's/#{pattern}/#{content}\\n&/' #{path}",
+            test: :command,
+            expected: RawCommand.new("grep '#{grep_escape content}' #{path}")
           ) ]
         end
       ),
@@ -65,8 +76,26 @@ defmodule DigitalOceanExplorations.Command do
           [ RawCommand.new(
             "sed -i -e 's/#{pattern}/&\\n#{content}/' #{path}",
             test: :command,
-            expected: RawCommand.new("grep '#{content}' #{path}")
+            expected: RawCommand.new("grep '#{grep_escape content}' #{path}")
           ) ]
+        end
+      ),
+      new(
+        name: :replace_in_file,
+        supports: %{"Ubuntu" => ["16.04.1 x64"]},
+        converter: fn path, pattern, replacement ->
+          [ RawCommand.new(
+            "sed -i -e 's/#{pattern}/#{replacement}/' #{path}",
+            test: :command,
+            expected: RawCommand.new("grep '#{grep_escape replacement}' #{path}")
+          ) ]
+        end
+      ),
+      new(
+        name: :restart_service,
+        supports: %{"Ubuntu" => ["16.04.1 x64"]},
+        converter: fn service ->
+          [RawCommand.new("service #{service} restart")]
         end
       )
     ], %{ })
@@ -98,4 +127,9 @@ defmodule DigitalOceanExplorations.Command do
     map_versions(command, distribution, versions, new_mapped)
   end
   defp map_versions(_command, _distribution, [ ], mapped), do: mapped
+
+  defp grep_escape(raw_text) do
+    raw_text
+    # String.replace(raw_text, "+", "\\+")
+  end
 end
